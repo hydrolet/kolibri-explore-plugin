@@ -12,4 +12,15 @@ kolibri manage collectstatic --clear --noinput
 
 kolibri services --background
 
+rm -rf $KOLIBRI_HOME/populated
+rm -rf $KOLIBRI_HOME/content
+
+# Initial populate
+if [ ! -e $KOLIBRI_HOME/populated ]
+then
+    # populate initial content
+    /docker/populate/populate.sh &
+    echo "done" > $KOLIBRI_HOME/populated
+fi
+
 uwsgi --ini uwsgi.ini

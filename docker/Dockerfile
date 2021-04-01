@@ -21,6 +21,9 @@ RUN pip install kolibri
 COPY uwsgi.ini /docker/uwsgi.ini
 COPY entrypoint.sh /docker/entrypoint.sh
 
+# populate scripts
+COPY populate/ /docker/populate/
+
 RUN pip install kolibri-explore-plugin
 
 ENTRYPOINT [ "/docker/entrypoint.sh" ]
