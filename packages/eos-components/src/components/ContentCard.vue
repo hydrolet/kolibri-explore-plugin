@@ -54,7 +54,7 @@ export default {
     },
     cardStyle() {
       return {
-        backgroundImage: `url("${this.thumbnail}")`,
+        backgroundImage: `url("${this.node.thumbnail_url}")`,
       };
     },
     kind() {
