@@ -181,8 +181,9 @@ export function showFilteredChannels(store) {
   );
 }
 
-export function searchChannels(store, search, kind) {
+export function searchChannels(store, search, kind, searchQueryIndex = 0) {
   store.commit('CORE_SET_PAGE_LOADING', true);
+  store.commit('topicsRoot/SET_SEARCH_QUERY_INDEX', searchQueryIndex);
   return ContentNodeSearchResource.fetchCollection({
     getParams: {
       search,
@@ -197,7 +198,7 @@ export function searchChannels(store, search, kind) {
       channel: rootNodes.find(c => c.id === n.channel_id),
     }));
     const promises = channel_ids.map(id => ChannelResource.fetchModel({ id }));
-    Promise.all(promises).then(collection => {
+    return Promise.all(promises).then(collection => {
       const channels = collection
         .map(c => ({
           ...c,
@@ -206,6 +207,12 @@ export function searchChannels(store, search, kind) {
           order: channel_ids.indexOf(c.id),
         }))
         .sort((a, b) => a.order - b.order);
+
+      // Drop results for old searches
+      if (searchQueryIndex !== store.state.topicsRoot.searchQueryIndex) {
+        return searchQueryIndex;
+      }
+
       store.commit('topicsRoot/SET_SEARCH_RESULT', {
         ...store.state.topicsRoot.searchResult,
         [kind]: {
@@ -215,6 +222,7 @@ export function searchChannels(store, search, kind) {
         },
       });
       store.commit('CORE_SET_PAGE_LOADING', false);
+      return searchQueryIndex;
     });
   });
 }

@@ -123,6 +123,7 @@
     mixins: [responsiveMixin],
     data() {
       return {
+        searchQueryIndex: 0,
         query: '',
         cardColumns: {
           cols: 6,
@@ -258,10 +259,14 @@
         }
 
         this.progress = 0;
+        this.searchQueryIndex = this.searchQueryIndex + 1;
         kinds.forEach(k => {
-          searchChannels(this.$store, query, k).then(() => {
-            this.resultKinds.push(k);
-            this.progress += 100 / kinds.length;
+          searchChannels(this.$store, query, k, this.searchQueryIndex).then(searchQueryIndex => {
+            // Drop results for old searches
+            if (searchQueryIndex === this.searchQueryIndex) {
+              this.resultKinds.push(k);
+              this.progress += 100 / kinds.length;
+            }
           });
         });
       },
