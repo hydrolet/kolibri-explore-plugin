@@ -181,13 +181,21 @@ export function showFilteredChannels(store) {
   );
 }
 
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 export function searchChannelsOnce(store, search, kind) {
-  const searchPromise = ContentNodeSearchResource.fetchCollection({
-    getParams: {
-      search,
-      kind,
-      max_results: SEARCH_MAX_RESULTS,
-    },
+  console.log(`FETCHING kind: ${kind} search: ${search}`);
+  const delayMs = Math.floor(3000 + Math.random() * 3000);
+  const searchPromise = delay(delayMs).then(() => {
+    return ContentNodeSearchResource.fetchCollection({
+      getParams: {
+        search,
+        kind,
+        max_results: SEARCH_MAX_RESULTS,
+      },
+    });
   });
   store.commit('topicsRoot/SET_LAST_SEARCH_PROMISE', { kind, searchPromise });
   return new Promise(resolve => {
@@ -195,14 +203,17 @@ export function searchChannelsOnce(store, search, kind) {
       const { lastSearchPromises } = store.state.topicsRoot;
       if (searchPromise == lastSearchPromises[kind]) {
         store.commit('topicsRoot/SET_LAST_SEARCH_PROMISE', { kind, searchPromise: null });
-        setSearchResults(store, searchResults, kind);
+        setSearchResults(store, searchResults, kind, search);
         resolve(searchResults);
+      } else {
+        console.log(`DROPPING kind: ${kind} search: ${search}`);
       }
     });
   });
 }
 
-function setSearchResults(store, searchResults, kind) {
+function setSearchResults(store, searchResults, kind, search) {
+  console.log(`SETTING kind: ${kind} search: ${search}`);
   store.commit('CORE_SET_PAGE_LOADING', true);
   const { rootNodes } = store.state.topicsRoot;
   const { channel_ids, results } = searchResults;
