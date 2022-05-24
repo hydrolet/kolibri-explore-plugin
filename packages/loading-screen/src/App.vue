@@ -3,7 +3,16 @@
     id="app"
     class="align-items-center d-flex flex-column justify-content-center text-center vh-100"
   >
-    <div class="loading">
+    <div v-if="showContentChoice" class="content-choice">
+      <b-button variant="primary" @click="downloadContent">
+        Donwnload content
+      </b-button>
+      <br>
+      <b-button variant="primary" @click="connectKey">
+        Connect your Key
+      </b-button>
+    </div>
+    <div v-else class="loading">
       <img v-if="isLoading" :src="loadingImage" class="mb-1">
       <b-icon-exclamation-circle v-if="!isLoading" variant="dark" fontScale="4" class="mb-3" />
       <div v-if="isError">
@@ -56,6 +65,7 @@ export default {
       kolibriImage: kolibriImage,
       state: 'default',
       firstLaunch: false,
+      showContentChoice: false,
     };
   },
   computed: {
@@ -94,6 +104,10 @@ export default {
     window.firstLaunch = () => {
       this.setFirstLaunch(true);
     }
+
+    window.showContentChoice = (value) => {
+      this.setShowContentChoice(value);
+    }
   },
   beforeDestroy() {
     function fallback() {
@@ -110,6 +124,17 @@ export default {
     },
     setFirstLaunch(value) {
       this.firstLaunch = value;
+    },
+    setShowContentChoice(value) {
+      this.showContentChoice = value;
+    },
+    downloadContent() {
+      console.log('Download content');
+      window.location.href = 'http://download-content';
+    },
+    connectKey() {
+      console.log('Connect Key');
+      window.location.href = 'http://connect-key';
     },
   },
 };
